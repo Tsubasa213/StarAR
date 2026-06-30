@@ -19,3 +19,6 @@ MemoryCaptures/
 
 .DS_Store
 Thumbs.db
+
+.plastic/
+plastic.workspace
