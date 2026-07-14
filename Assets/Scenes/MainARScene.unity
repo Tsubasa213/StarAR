@@ -376,7 +376,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &533857466
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -597,7 +597,7 @@ Transform:
   m_Children:
   - {fileID: 291327161}
   - {fileID: 1198927540}
-  m_Father: {fileID: 1370168847}
+  m_Father: {fileID: 1493987619}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1167446570
 GameObject:
@@ -863,11 +863,43 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1742066904}
-  - {fileID: 1031855388}
   - {fileID: 539305089}
   - {fileID: 1356595390}
   - {fileID: 1194023602}
+  - {fileID: 1493987619}
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1493987618
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1493987619}
+  m_Layer: 0
+  m_Name: GalacticRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1493987619
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493987618}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1031855388}
+  m_Father: {fileID: 1370168847}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1742066900
 GameObject:

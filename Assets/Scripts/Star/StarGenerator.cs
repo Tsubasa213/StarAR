@@ -9,6 +9,10 @@ public class StarGenerator : MonoBehaviour
     [SerializeField]
     private float celestialRadius = 100f;
 
+    // 追加: 赤道座標系の基準となる親オブジェクト
+    [SerializeField]
+    private Transform celestialSphere;
+
     void Start()
     {
         GenerateStars();
@@ -79,14 +83,13 @@ public class StarGenerator : MonoBehaviour
             Mathf.Cos(dec) *
             Mathf.Sin(ra);
 
+        // 変更: transform ではなく celestialSphere を親として生成する
         GameObject star =
             Instantiate(
                 starPrefab,
                 new Vector3(x, y, z),
                 Quaternion.identity,
-                transform
-
-            
+                celestialSphere
             );
 
         //-------------------------
@@ -116,9 +119,7 @@ public class StarGenerator : MonoBehaviour
             "_BaseColor",
             color * 2.5f
         );
-
-
-        }
+    }
 
     Color GetStarColor(float bv)
     {

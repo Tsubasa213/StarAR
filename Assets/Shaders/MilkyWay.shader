@@ -5,9 +5,6 @@ Shader "Custom/SeamlessMilkyWaySphere"
         [HDR] _CoreColor ("Core Color (中心の色)", Color) = (1.0, 0.8, 0.5, 1.0)
         [HDR] _EdgeColor ("Edge Color (外側の色)", Color) = (0.05, 0.15, 0.4, 1.0)
         
-        // 天の川の傾き（X軸回転）
-        _TiltAngle ("Galactic Tilt (傾き)", Range(0.0, 360.0)) = 45.0
-        
         _Thickness ("Band Thickness (帯の太さ)", Range(0.01, 1.0)) = 0.25
         _NoiseScale ("Noise Scale (雲の細かさ)", Range(1.0, 50.0)) = 15.0
         _Intensity ("Overall Intensity", Range(0.1, 5.0)) = 2.0
@@ -19,7 +16,6 @@ Shader "Custom/SeamlessMilkyWaySphere"
 
         ZWrite Off
         Blend SrcAlpha One
-        // スフィアの内側から見ても描画されるように両面描画にする
         Cull Off
 
         Pass
@@ -37,19 +33,16 @@ Shader "Custom/SeamlessMilkyWaySphere"
             struct v2f
             {
                 float4 pos : SV_POSITION;
-                // UVではなく、3Dのローカル座標をフラグメントに渡す
                 float3 localPos : TEXCOORD0;
             };
 
             float4 _CoreColor;
             float4 _EdgeColor;
-            float _TiltAngle;
             float _Thickness;
             float _NoiseScale;
             float _Intensity;
 
             // --- 3D疑似乱数と3Dノイズ関数 ---
-            // 3D空間上でノイズを計算するため、繋ぎ目が絶対に発生しません
             float hash(float3 p)
             {
                 float3 p3 = frac(p * 0.1031);
@@ -87,7 +80,7 @@ Shader "Custom/SeamlessMilkyWaySphere"
             {
                 float v = 0.0;
                 float a = 0.5;
-                for (int i = 0; i < 5; i++) // スケールが大きいのでループ回数を増やしてディテールUP
+                for (int i = 0; i < 5; i++) 
                 {
                     v += a * noise3D(p);
                     p = p * 2.0;
@@ -101,39 +94,27 @@ Shader "Custom/SeamlessMilkyWaySphere"
             {
                 v2f o;
                 o.pos = UnityObjectToClipPos(v.vertex);
-                // 頂点のローカル座標をそのまま渡す
                 o.localPos = v.vertex.xyz;
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // 1. スフィアの中心からの方向ベクトルを取得（サイズ220に影響されないように正規化）
+                // 1. スフィアの中心からの方向ベクトルを取得
                 float3 dir = normalize(i.localPos);
-
-                // 2. 角度の計算（X軸周りの回転）
-                float rad = radians(_TiltAngle);
-                float s, c;
-                sincos(rad, s, c);
                 
-                // 3Dベクトルを回転させる
-                float3 rotatedDir = dir;
-                rotatedDir.y = dir.y * c - dir.z * s;
-                rotatedDir.z = dir.y * s + dir.z * c;
-
-                // 3. 天の川の「帯」の計算（回転後のY軸からの距離）
-                float distFromEquator = abs(rotatedDir.y);
+                // 2. 天の川の「帯」の計算（Y軸からの距離のみを使用）
+                float distFromEquator = abs(dir.y);
                 float bandMask = smoothstep(_Thickness, 0.0, distFromEquator);
 
-                // 4. 3Dノイズの適用
-                // dirにノイズスケールを掛けて、球体の表面に沿って雲を発生させる
+                // 3. 3Dノイズの適用
                 float cloudNoise = fbm3D(dir * _NoiseScale);
-                
+
                 // 帯とノイズを合成
                 float density = bandMask * cloudNoise;
                 density = pow(density, 1.5);
 
-                // 5. 色の合成
+                // 4. 色の合成
                 float3 finalColor = lerp(_EdgeColor.rgb, _CoreColor.rgb, density) * density * _Intensity;
 
                 return fixed4(finalColor, density);
