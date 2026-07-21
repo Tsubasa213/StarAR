@@ -45,7 +45,8 @@ public static class SiderealTime
             utc.Day +
             utc.Hour / 24.0 +
             utc.Minute / 1440.0 +
-            utc.Second / 86400.0;
+            utc.Second / 86400.0 +
+            utc.Millisecond / 86400000.0;
 
         if (M <= 2)
         {

@@ -575,7 +575,7 @@ PlayerSettings:
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
   cameraUsageDescription: AR Camera
-  locationUsageDescription: 
+  locationUsageDescription: Used to align the star sky with the device location.
   microphoneUsageDescription: 
   bluetoothUsageDescription: 
   macOSTargetOSVersion: 12.0

@@ -9,6 +9,10 @@ public class StarGenerator : MonoBehaviour
     [SerializeField]
     private float celestialRadius = 100f;
 
+    [Tooltip("Resources内の星表名。stars_5は約5等星まで、stars_6は約6等星まで読み込みます。")]
+    [SerializeField]
+    private string starCatalogResourceName = "stars_5";
+
     // 追加: 赤道座標系の基準となる親オブジェクト
     [SerializeField]
     private Transform celestialSphere;
@@ -20,27 +24,39 @@ public class StarGenerator : MonoBehaviour
 
     void GenerateStars()
     {
-        TextAsset csvFile = Resources.Load<TextAsset>("stars_6");
-        Debug.Log(csvFile.text.Substring(0, 300));
+        string resourceName = string.IsNullOrWhiteSpace(starCatalogResourceName)
+            ? "stars_5"
+            : starCatalogResourceName.Trim();
+
+        TextAsset csvFile = Resources.Load<TextAsset>(resourceName);
         if (csvFile == null)
         {
-            Debug.LogError("stars_6.csv が見つかりません");
+            Debug.LogError($"星表 {resourceName}.csv が見つかりません");
             return;
         }
 
+        Debug.Log($"StarGenerator: {resourceName}.csv を読み込みます。");
+
         string[] lines = csvFile.text.Split('\n');
+
+        int generatedCount = 0;
 
         for (int i = 1; i < lines.Length; i++)
         {
-            if (string.IsNullOrWhiteSpace(lines[i]))
+            string line = lines[i].Trim();
+            if (string.IsNullOrWhiteSpace(line))
                 continue;
 
-            Debug.Log($"===== 行 {i} =====");
-
-            string[] cols = lines[i].Split(',');
+            string[] cols = line.Split(',');
 
             try
             {
+                if (cols.Length < 6)
+                {
+                    Debug.LogWarning($"列不足のためスキップ: {i}");
+                    continue;
+                }
+
                 float ra = float.Parse(cols[0], CultureInfo.InvariantCulture);
                 float dec = float.Parse(cols[1], CultureInfo.InvariantCulture);
                 float mag = float.Parse(cols[4], CultureInfo.InvariantCulture);
@@ -52,16 +68,17 @@ public class StarGenerator : MonoBehaviour
                 }
 
                 CreateStar(ra, dec, mag, bv);
+                generatedCount++;
             }
             catch
             {
                 Debug.LogError($"エラー行: {i}");
-                Debug.LogError(lines[i]);
-                return;
+                Debug.LogError(line);
             }
         }
 
-        Debug.Log("星生成完了");
+        Debug.Log(
+            $"StarGenerator: 星生成完了。catalog={resourceName}, count={generatedCount}");
     }
 
     void CreateStar(float raDeg, float decDeg, float mag, float bv)
