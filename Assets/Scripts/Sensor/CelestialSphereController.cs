@@ -1,170 +1,323 @@
-using System;
-using UnityEngine;
+// using System;
+// using UnityEngine;
 
-/// <summary>
-/// Converts the observer location and sidereal time into the sky rotation.
-/// This is the single rotation writer for the celestial sphere.
-/// </summary>
-public class CelestialSphereController : MonoBehaviour
-{
-    [Header("Rotation Target")]
-    [SerializeField]
-    private Transform celestialSphere;
+// /// <summary>
+// /// GPS・コンパス・時刻から天球の向きを計算する。
+// ///
+// /// SkyRootの回転を担当する唯一のスクリプト。
+// /// Cameraの回転には一切触れない。
+// /// </summary>
+// public class CelestialSphereController : MonoBehaviour
+// {
+//     [Header("Rotation Target")]
+//     [SerializeField]
+//     private Transform celestialSphere;
 
-    [Tooltip("Small fixed correction for matching the catalog axes to the Milky Way artwork.")]
-    [SerializeField]
-    private Vector3 alignmentEulerAngles = Vector3.zero;
+//     [Header("Alignment")]
+//     [Tooltip("星・天の川のモデルと実際の天球座標を合わせるための補正値")]
+//     [SerializeField]
+//     private Vector3 alignmentEulerAngles = Vector3.zero;
 
-    [Tooltip("1 is real time. 600 is a debug setting that advances sidereal time by about 10 minutes per real second.")]
-    [Min(0f)]
-    [SerializeField]
-    private float siderealTimeScale = 1f;
+//     [Header("Sidereal Time")]
+//     [Tooltip("1 = 実時間。600 = 恒星時を約600倍速")]
+//     [Min(0f)]
+//     [SerializeField]
+//     private float siderealTimeScale = 1f;
 
-    [Tooltip("Reverse the sidereal rotation direction if the sky moves opposite to the intended direction.")]
-    [SerializeField]
-    private bool reverseSiderealDirection = false;
+//     [SerializeField]
+//     private bool reverseSiderealDirection = false;
 
-    [Header("Astronomy Debug")]
-    [Tooltip("Write the active location, UTC, and local sidereal time to the Unity log periodically.")]
-    [SerializeField]
-    private bool logAstronomyState = true;
+//     [Header("Compass")]
+//     [Tooltip("コンパス方位をSkyRootのY回転に反映する")]
+//     [SerializeField]
+//     private bool useCompass = true;
 
-    [Min(1f)]
-    [SerializeField]
-    private float astronomyLogIntervalSeconds = 5f;
+//     [Tooltip("コンパスの向きを反転する必要がある場合")]
+//     [SerializeField]
+//     private bool reverseCompass = false;
 
-    private bool isInitialized;
-    private double previousSiderealTime;
-    private double simulatedSiderealTime;
-    private Quaternion alignmentRotation;
-    private float nextAstronomyLogTime;
+//     [Header("Debug")]
+//     [SerializeField]
+//     private bool logAstronomyState = true;
 
-    public DateTime CurrentUtc { get; private set; }
+//     [SerializeField]
+//     private float logIntervalSeconds = 5f;
 
-    public double CurrentLocalSiderealTimeDegrees { get; private set; }
+//     private Quaternion alignmentRotation;
 
-    public void ResetToCurrentAstronomy()
-    {
-        isInitialized = false;
-        nextAstronomyLogTime = 0f;
-        Debug.Log(
-            "CelestialSphereController: current UTC and location will be " +
-            "applied on the next frame.");
-    }
+//     private double simulatedSiderealTime;
 
-    private void Awake()
-    {
-        if (celestialSphere == null)
-        {
-            celestialSphere = transform;
-        }
+//     private bool initialized;
 
-        alignmentRotation = Quaternion.Euler(alignmentEulerAngles);
-    }
+//     private float nextLogTime;
 
-    private void Update()
-    {
-        LocationProvider location = LocationProvider.Instance;
+//     public DateTime CurrentUtc { get; private set; }
 
-        if (location == null || !location.IsReady || celestialSphere == null)
-        {
-            return;
-        }
+//     public double CurrentLocalSiderealTimeDegrees
+//     {
+//         get;
+//         private set;
+//     }
 
-        // Use the actual current UTC time as the source of truth. This keeps
-        // the sky correct after pausing, resuming, or changing the device time.
-        DateTime currentUtc = DateTime.UtcNow;
-        double currentSiderealTime = SiderealTime.GetLocalSiderealTime(
-            currentUtc,
-            location.Longitude);
+//     public double Latitude
+//     {
+//         get;
+//         private set;
+//     }
 
-        CurrentUtc = currentUtc;
-        CurrentLocalSiderealTimeDegrees = currentSiderealTime;
+//     public double Longitude
+//     {
+//         get;
+//         private set;
+//     }
 
-        if (!isInitialized)
-        {
-            previousSiderealTime = currentSiderealTime;
-            simulatedSiderealTime = currentSiderealTime;
-            isInitialized = true;
-        }
-        else if (Mathf.Approximately(siderealTimeScale, 1f))
-        {
-            // In normal mode, do not accumulate frame deltas. Recalculate
-            // from the current clock so the displayed sky cannot drift.
-            simulatedSiderealTime = currentSiderealTime;
-            previousSiderealTime = currentSiderealTime;
-        }
-        else
-        {
-            // Keep the accelerated clock for Editor/device demonstrations.
-            double frameDelta = GetSignedAngleDelta(
-                currentSiderealTime,
-                previousSiderealTime);
+//     public float Heading
+//     {
+//         get;
+//         private set;
+//     }
 
-            simulatedSiderealTime = NormalizeDegrees(
-                simulatedSiderealTime + frameDelta * siderealTimeScale);
+//     private void Awake()
+//     {
+//         if (celestialSphere == null)
+//         {
+//             celestialSphere = transform;
+//         }
 
-            previousSiderealTime = currentSiderealTime;
-        }
+//         alignmentRotation =
+//             Quaternion.Euler(alignmentEulerAngles);
+//     }
 
-        if (logAstronomyState &&
-            (nextAstronomyLogTime <= 0f ||
-             Time.unscaledTime >= nextAstronomyLogTime))
-        {
-            Debug.Log(
-                $"CelestialSphereController: {location.StatusMessage}; " +
-                $"lat={location.Latitude:F6}, lon={location.Longitude:F6}, " +
-                $"UTC={currentUtc:O}, " +
-                $"LST={simulatedSiderealTime:F3} deg");
+//     private void Start()
+//     {
+//         RecalculateSky();
+//     }
 
-            nextAstronomyLogTime = Time.unscaledTime +
-                Mathf.Max(1f, astronomyLogIntervalSeconds);
-        }
+//     private void Update()
+//     {
+//         RecalculateSky();
+//     }
 
-        Quaternion latitudeRotation = Quaternion.Euler(
-            (float)location.Latitude - 90f,
-            0f,
-            0f);
+//     /// <summary>
+//     /// GPS・コンパス・時刻から天球を再計算する。
+//     /// </summary>
+//     public void RecalculateSky()
+//     {
+//         if (celestialSphere == null)
+//         {
+//             return;
+//         }
 
-        float siderealDirection = reverseSiderealDirection ? 1f : -1f;
-        Quaternion siderealRotation = Quaternion.Euler(
-            0f,
-            (float)simulatedSiderealTime * siderealDirection,
-            0f);
+//         LocationProvider location =
+//             LocationProvider.Instance;
 
-        celestialSphere.localRotation =
-            alignmentRotation *
-            siderealRotation *
-            latitudeRotation;
-    }
+//         CompassSensor compass =
+//             CompassSensor.Instance;
 
-    private static double GetSignedAngleDelta(
-        double current,
-        double previous)
-    {
-        double delta = current - previous;
+//         if (location == null ||
+//             !location.IsReady)
+//         {
+//             return;
+//         }
 
-        if (delta < -180d)
-        {
-            delta += 360d;
-        }
-        else if (delta > 180d)
-        {
-            delta -= 360d;
-        }
+//         Latitude = location.Latitude;
+//         Longitude = location.Longitude;
 
-        return delta;
-    }
+//         CurrentUtc = DateTime.UtcNow;
 
-    private static double NormalizeDegrees(double degrees)
-    {
-        degrees %= 360d;
+//         CurrentLocalSiderealTimeDegrees =
+//             SiderealTime.GetLocalSiderealTime(
+//                 CurrentUtc,
+//                 Longitude
+//             );
 
-        if (degrees < 0d)
-        {
-            degrees += 360d;
-        }
+//         if (!initialized)
+//         {
+//             simulatedSiderealTime =
+//                 CurrentLocalSiderealTimeDegrees;
 
-        return degrees;
-    }
-}
+//             initialized = true;
+//         }
+//         else
+//         {
+//             if (Mathf.Approximately(
+//                     siderealTimeScale,
+//                     1f))
+//             {
+//                 simulatedSiderealTime =
+//                     CurrentLocalSiderealTimeDegrees;
+//             }
+//             else
+//             {
+//                 simulatedSiderealTime =
+//                     NormalizeDegrees(
+//                         simulatedSiderealTime +
+//                         GetSiderealDelta() *
+//                         siderealTimeScale
+//                     );
+//             }
+//         }
+
+//         if (compass != null &&
+//             compass.IsAvailable)
+//         {
+//             Heading = compass.Heading;
+//         }
+
+//         ApplyRotation();
+
+//         WriteDebugLog(location);
+//     }
+
+//     private double previousSiderealTime;
+
+//     private double GetSiderealDelta()
+//     {
+//         double current =
+//             CurrentLocalSiderealTimeDegrees;
+
+//         if (!initialized)
+//         {
+//             previousSiderealTime = current;
+//             return 0d;
+//         }
+
+//         double delta =
+//             current - previousSiderealTime;
+
+//         if (delta < -180d)
+//         {
+//             delta += 360d;
+//         }
+//         else if (delta > 180d)
+//         {
+//             delta -= 360d;
+//         }
+
+//         previousSiderealTime = current;
+
+//         return delta;
+//     }
+
+//     private void ApplyRotation()
+//     {
+//         /*
+//          * 緯度による天球の傾き
+//          */
+//         Quaternion latitudeRotation =
+//             Quaternion.Euler(
+//                 (float)Latitude - 90f,
+//                 0f,
+//                 0f
+//             );
+
+//         /*
+//          * 恒星時による地球自転
+//          */
+//         float siderealDirection =
+//             reverseSiderealDirection
+//                 ? 1f
+//                 : -1f;
+
+//         Quaternion siderealRotation =
+//             Quaternion.Euler(
+//                 0f,
+//                 (float)simulatedSiderealTime *
+//                 siderealDirection,
+//                 0f
+//             );
+
+//         /*
+//          * 真北方向
+//          */
+//         Quaternion compassRotation =
+//             Quaternion.identity;
+
+//         if (useCompass)
+//         {
+//             float heading =
+//                 reverseCompass
+//                     ? -Heading
+//                     : Heading;
+
+//             compassRotation =
+//                 Quaternion.Euler(
+//                     0f,
+//                     -heading,
+//                     0f
+//                 );
+//         }
+
+//         celestialSphere.localRotation =
+//             alignmentRotation *
+//             compassRotation *
+//             siderealRotation *
+//             latitudeRotation;
+//     }
+
+//     /// <summary>
+//     /// 画面復帰時などに呼び出す。
+//     /// </summary>
+//     public void ResetToCurrentAstronomy()
+//     {
+//         initialized = false;
+//         previousSiderealTime = 0d;
+
+//         CompassSensor compass =
+//             CompassSensor.Instance;
+
+//         if (compass != null)
+//         {
+//             compass.Refresh();
+//         }
+
+//         RecalculateSky();
+
+//         Debug.Log(
+//             "CelestialSphereController: astronomy recalculated."
+//         );
+//     }
+
+//     private void WriteDebugLog(
+//         LocationProvider location)
+//     {
+//         if (!logAstronomyState)
+//         {
+//             return;
+//         }
+
+//         if (Time.unscaledTime < nextLogTime)
+//         {
+//             return;
+//         }
+
+//         Debug.Log(
+//             $"Sky: " +
+//             $"lat={Latitude:F6}, " +
+//             $"lon={Longitude:F6}, " +
+//             $"heading={Heading:F2}, " +
+//             $"UTC={CurrentUtc:O}, " +
+//             $"LST={simulatedSiderealTime:F3}"
+//         );
+
+//         nextLogTime =
+//             Time.unscaledTime +
+//             Mathf.Max(
+//                 1f,
+//                 logIntervalSeconds
+//             );
+//     }
+
+//     private static double NormalizeDegrees(
+//         double degrees)
+//     {
+//         degrees %= 360d;
+
+//         if (degrees < 0d)
+//         {
+//             degrees += 360d;
+//         }
+
+//         return degrees;
+//     }
+// }

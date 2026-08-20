@@ -1,71 +1,28 @@
 using System.Collections;
 using UnityEngine;
-#if UNITY_ANDROID && !UNITY_EDITOR
-using UnityEngine.Android;
-#endif
 
+/// <summary>
+/// Android端末から緯度・経度を取得する軽量な位置情報プロバイダ。
+/// </summary>
 public class LocationProvider : MonoBehaviour
 {
     public static LocationProvider Instance { get; private set; }
 
-    [Header("Location Service")]
+    [Header("GPS Settings")]
     [SerializeField]
-    private float desiredAccuracyInMeters = 10f;
+    private float desiredAccuracyMeters = 10f;
 
     [SerializeField]
-    private float updateDistanceInMeters = 1f;
-
-    [SerializeField]
-    private int startupTimeoutSeconds = 20;
-
-    [Header("Editor Fallback")]
-    [Tooltip("Unity Editor has no device GPS, so use this fixed location for testing.")]
-    [SerializeField]
-    private bool useEditorFallback = true;
-
-    [SerializeField]
-    private double fallbackLatitude = 34.693738;
-
-    [SerializeField]
-    private double fallbackLongitude = 135.502165;
+    private float updateDistanceMeters = 1f;
 
     public bool IsReady { get; private set; }
 
-    public bool IsUsingFallback { get; private set; }
-
-    public string StatusMessage { get; private set; } = "Not started";
-
     public double Latitude { get; private set; }
-
     public double Longitude { get; private set; }
 
-    public bool RefreshNow()
-    {
-        if (!IsReady)
-        {
-            Debug.LogWarning("LocationProvider: refresh requested before location was ready.");
-            return false;
-        }
+    public string StatusMessage { get; private set; } = "GPS initializing...";
 
-        if (!IsUsingFallback)
-        {
-            if (Input.location.status != LocationServiceStatus.Running)
-            {
-                SetError($"Location service stopped: {Input.location.status}");
-                return false;
-            }
-
-            UpdateLocation();
-        }
-
-        StatusMessage = IsUsingFallback
-            ? "Using Editor fallback location"
-            : "Using device location";
-
-        Debug.Log(
-            $"LocationProvider: refreshed ({Latitude:F6}, {Longitude:F6})");
-        return true;
-    }
+    private Coroutine locationCoroutine;
 
     private void Awake()
     {
@@ -76,118 +33,118 @@ public class LocationProvider : MonoBehaviour
         }
 
         Instance = this;
+
         DontDestroyOnLoad(gameObject);
     }
 
-    private IEnumerator Start()
+    private void Start()
     {
-#if UNITY_EDITOR
-        if (useEditorFallback)
-        {
-            SetLocation(fallbackLatitude, fallbackLongitude, true);
-            StatusMessage = "Using Editor fallback location";
-            Debug.Log($"LocationProvider: {StatusMessage} ({Latitude:F6}, {Longitude:F6})");
-            yield break;
-        }
-#endif
+        StartLocation();
+    }
 
-        yield return StartLocationService();
+    public void RefreshNow()
+    {
+        IsReady = false;
+        StartLocation();
+    }
+
+    private void StartLocation()
+    {
+        if (locationCoroutine != null)
+        {
+            StopCoroutine(locationCoroutine);
+        }
+
+        locationCoroutine = StartCoroutine(StartLocationService());
     }
 
     private IEnumerator StartLocationService()
     {
-        StatusMessage = "Starting device location service";
+        StatusMessage = "Starting GPS...";
 
         if (!Input.location.isEnabledByUser)
         {
-            SetError("Location service is disabled by the user");
+            StatusMessage = "Location service is disabled.";
+            Debug.LogWarning("LocationProvider: GPS is disabled.");
             yield break;
         }
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
-        {
-            Permission.RequestUserPermission(Permission.FineLocation);
-
-            float permissionTimeout = 5f;
-            while (!Permission.HasUserAuthorizedPermission(Permission.FineLocation) &&
-                   permissionTimeout > 0f)
-            {
-                permissionTimeout -= Time.unscaledDeltaTime;
-                yield return null;
-            }
-        }
-
-        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
-        {
-            SetError("Fine location permission was not granted");
-            yield break;
-        }
-#endif
+        Input.location.Stop();
 
         Input.location.Start(
-            Mathf.Max(1f, desiredAccuracyInMeters),
-            Mathf.Max(0f, updateDistanceInMeters));
+            desiredAccuracyMeters,
+            updateDistanceMeters
+        );
 
-        int remainingSeconds = Mathf.Max(1, startupTimeoutSeconds);
+        int maxWait = 20;
 
-        while (Input.location.status == LocationServiceStatus.Initializing &&
-               remainingSeconds > 0)
+        while (
+            Input.location.status == LocationServiceStatus.Initializing &&
+            maxWait > 0
+        )
         {
-            yield return new WaitForSeconds(1f);
-            remainingSeconds--;
+            yield return new WaitForSecondsRealtime(1f);
+            maxWait--;
         }
 
-        if (Input.location.status != LocationServiceStatus.Running)
+        if (maxWait <= 0)
         {
-            SetError($"Location service failed: {Input.location.status}");
+            StatusMessage = "GPS initialization timeout.";
+            Debug.LogWarning(
+                "LocationProvider: GPS initialization timed out."
+            );
             yield break;
         }
 
-        IsUsingFallback = false;
-        IsReady = true;
-        StatusMessage = "Using device location";
+        if (Input.location.status == LocationServiceStatus.Failed)
+        {
+            StatusMessage = "GPS failed.";
+            Debug.LogWarning(
+                "LocationProvider: unable to determine device location."
+            );
+            yield break;
+        }
+
         UpdateLocation();
 
-        Debug.Log($"LocationProvider: {StatusMessage} ({Latitude:F6}, {Longitude:F6})");
+        IsReady = true;
+
+        StatusMessage =
+            $"GPS ready: lat={Latitude:F6}, lon={Longitude:F6}";
+
+        Debug.Log(
+            $"LocationProvider: {StatusMessage}"
+        );
     }
 
     private void Update()
     {
-        if (!IsReady || IsUsingFallback)
+        if (!IsReady)
         {
             return;
         }
 
-        if (Input.location.status != LocationServiceStatus.Running)
+        if (Input.location.status == LocationServiceStatus.Running)
         {
-            SetError($"Location service stopped: {Input.location.status}");
-            return;
+            UpdateLocation();
         }
-
-        UpdateLocation();
     }
 
     private void UpdateLocation()
     {
-        LocationInfo location = Input.location.lastData;
-        Latitude = location.latitude;
-        Longitude = location.longitude;
+        LocationInfo data = Input.location.lastData;
+
+        Latitude = data.latitude;
+        Longitude = data.longitude;
     }
 
-    private void SetLocation(double latitude, double longitude, bool fallback)
+    private void OnDestroy()
     {
-        Latitude = latitude;
-        Longitude = longitude;
-        IsUsingFallback = fallback;
-        IsReady = true;
-    }
+        if (Instance == this)
+        {
+            Instance = null;
+        }
 
-    private void SetError(string message)
-    {
-        IsReady = false;
-        IsUsingFallback = false;
-        StatusMessage = message;
-        Debug.LogWarning($"LocationProvider: {message}");
+        Input.location.Stop();
     }
 }

@@ -11,7 +11,7 @@ public class StarGenerator : MonoBehaviour
 
     [Tooltip("Resources内の星表名。stars_5は約5等星まで、stars_6は約6等星まで読み込みます。")]
     [SerializeField]
-    private string starCatalogResourceName = "stars_5";
+    private string starCatalogResourceName = "stars";
 
     // 追加: 赤道座標系の基準となる親オブジェクト
     [SerializeField]

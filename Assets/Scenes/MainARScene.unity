@@ -293,8 +293,8 @@ Light:
     m_UseCullingMatrixOverride: 0
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
-   m_Flare: {fileID: 0}
-   m_RenderMode: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -554,26 +554,6 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 36006933e9e46c84c9599ac2e7cfc99b, type: 2}
---- !u!114 &2512387471000000004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 828376920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70d5adf9f0ec4c92a1deea4adf9f4bb1, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::ARBrightnessController
-  targetVolume: {fileID: 828376921}
-  targetCamera: {fileID: 2512387468973847745}
-  initialFilterOpacity: 0
-  minimumFilterOpacity: 0
-  maximumFilterOpacity: 1
-  useSolidBlackBackgroundForAndroidTest: 0
-  createRuntimeSlider: 1
-  createResetButton: 1
 --- !u!4 &828376922
 Transform:
   m_ObjectHideFlags: 0
@@ -604,7 +584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1031855388
 Transform:
   m_ObjectHideFlags: 0
@@ -867,6 +847,8 @@ GameObject:
   - component: {fileID: 1370168847}
   - component: {fileID: 2512387471000000000}
   - component: {fileID: 2512387471000000003}
+  - component: {fileID: 2512387471000000006}
+  - component: {fileID: 2512387471000000005}
   m_Layer: 0
   m_Name: SkyRoot
   m_TagString: Untagged
@@ -892,6 +874,7 @@ Transform:
   - {fileID: 1356595390}
   - {fileID: 1194023602}
   - {fileID: 1493987619}
+  - {fileID: 1659378963}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1493987618
@@ -926,6 +909,56 @@ Transform:
   - {fileID: 1031855388}
   m_Father: {fileID: 1370168847}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1659378962
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1659378963}
+  - component: {fileID: 1659378964}
+  m_Layer: 0
+  m_Name: SkyCalibrationController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1659378963
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659378962}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -65.35099, y: 0, z: 227.6038}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1370168847}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1659378964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659378962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52f5711ecd5c35a4cac9441c07d42fc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SkyCalibrationController
+  celestialSphere: {fileID: 0}
+  arCamera: {fileID: 0}
+  defaultLatitude: 34.6937
+  defaultLongitude: 135.5023
+  useGps: 1
+  calibrateDelay: 1.5
 --- !u!1 &1742066900
 GameObject:
   m_ObjectHideFlags: 0
@@ -1119,8 +1152,8 @@ MonoBehaviour:
   m_AutoFocus: 1
   m_ImageStabilization: 0
   m_LightEstimation: 0
-   m_FacingDirection: 1
-   m_RenderMode: 1
+  m_FacingDirection: 1
+  m_RenderMode: 1
 --- !u!114 &2512387468973847772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1133,8 +1166,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816b289ef451e094f9ae174fb4cf8db0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-   m_UseCustomMaterial: 1
-   m_CustomMaterial: {fileID: 2100000, guid: 8fd6e4a7f11b47c4b36d3f07a84e4f5d, type: 2}
+  m_UseCustomMaterial: 0
+  m_CustomMaterial: {fileID: 0}
 --- !u!114 &2512387468973847773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1265,7 +1298,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-    m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -1395,12 +1428,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkyController
   skyRoot: {fileID: 1370168847}
   northMarker: {fileID: 1742066904}
-  useGyroscope: 1
-  gyroCamera: {fileID: 0}
-  invertGyroscopeRotation: 1
-  preferAttitudeSensor: 1
-  gyroSamplingFrequency: 120
-  gyroNoiseDeadzone: 0.005
+  calibrationController: {fileID: 0}
 --- !u!4 &2512387470860572925
 Transform:
   m_ObjectHideFlags: 0
@@ -1444,11 +1472,14 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a0f6dcb37ca4d4b9f22b7fd715c94d1, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SiderealTimeRotation
   referenceLongitude: 0
   reverseDirection: 0
   siderealTimeScale: 1
+  initialLocalRotation: {x: 0, y: 0, z: 0, w: 0}
+  previousSiderealTime: 0
+  accumulatedSiderealDegrees: 0
 --- !u!114 &2512387471000000003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1459,14 +1490,73 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05f4a1166465c2045b07e8692826d951, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CelestialSphereController
   celestialSphere: {fileID: 1370168847}
   alignmentEulerAngles: {x: 0, y: 0, z: 0}
   siderealTimeScale: 1
   reverseSiderealDirection: 0
+  useCompass: 1
+  reverseCompass: 0
   logAstronomyState: 1
-  astronomyLogIntervalSeconds: 5
+  logIntervalSeconds: 5
+  alignmentRotation: {x: 0, y: 0, z: 0, w: 0}
+  simulatedSiderealTime: 0
+  initialized: 0
+  nextLogTime: 0
+  <CurrentLocalSiderealTimeDegrees>k__BackingField: 0
+  <Latitude>k__BackingField: 0
+  <Longitude>k__BackingField: 0
+  <Heading>k__BackingField: 0
+  previousSiderealTime: 0
+--- !u!114 &2512387471000000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 828376920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70d5adf9f0ec4c92a1deea4adf9f4bb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ARBrightnessController
+  targetVolume: {fileID: 828376921}
+  targetCamera: {fileID: 2512387468973847745}
+  initialFilterOpacity: 0
+  minimumFilterOpacity: 0
+  maximumFilterOpacity: 1
+  useSolidBlackBackgroundForAndroidTest: 0
+  createRuntimeSlider: 1
+  createResetButton: 1
+--- !u!114 &2512387471000000005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1370168846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512ebb532cb91e5408cd87984052a9da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialSkyRotation
+  orientation: {fileID: 0}
+  useRealTime: 1
+  timeScale: 1
+--- !u!114 &2512387471000000006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1370168846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cdb03af92ba6f14f92394cde3c12a2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CelestialSkyOrientation
+  celestialSphere: {fileID: 0}
 --- !u!1 &2512387471000000010
 GameObject:
   m_ObjectHideFlags: 0
@@ -1509,14 +1599,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61ddd55c49e8e2244b12737d04463f8f, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocationProvider
-  desiredAccuracyInMeters: 10
-  updateDistanceInMeters: 1
-  startupTimeoutSeconds: 20
-  useEditorFallback: 1
-  fallbackLatitude: 34.693738
-  fallbackLongitude: 135.502165
+  desiredAccuracyMeters: 10
+  updateDistanceMeters: 1
 --- !u!1001 &5498796844899973236
 PrefabInstance:
   m_ObjectHideFlags: 0
