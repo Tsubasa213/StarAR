@@ -248,7 +248,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &410087040
 Light:
   m_ObjectHideFlags: 0
@@ -1474,12 +1474,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a0f6dcb37ca4d4b9f22b7fd715c94d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SiderealTimeRotation
-  referenceLongitude: 0
-  reverseDirection: 0
-  siderealTimeScale: 1
-  initialLocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  previousSiderealTime: 0
-  accumulatedSiderealDegrees: 0
 --- !u!114 &2512387471000000003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1492,23 +1486,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05f4a1166465c2045b07e8692826d951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CelestialSphereController
-  celestialSphere: {fileID: 1370168847}
-  alignmentEulerAngles: {x: 0, y: 0, z: 0}
-  siderealTimeScale: 1
-  reverseSiderealDirection: 0
-  useCompass: 1
-  reverseCompass: 0
-  logAstronomyState: 1
-  logIntervalSeconds: 5
-  alignmentRotation: {x: 0, y: 0, z: 0, w: 0}
-  simulatedSiderealTime: 0
-  initialized: 0
-  nextLogTime: 0
-  <CurrentLocalSiderealTimeDegrees>k__BackingField: 0
-  <Latitude>k__BackingField: 0
-  <Longitude>k__BackingField: 0
-  <Heading>k__BackingField: 0
-  previousSiderealTime: 0
 --- !u!114 &2512387471000000004
 MonoBehaviour:
   m_ObjectHideFlags: 0
