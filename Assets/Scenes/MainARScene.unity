@@ -600,7 +600,7 @@ Transform:
   m_Children:
   - {fileID: 291327161}
   - {fileID: 1198927540}
-  m_Father: {fileID: 1493987619}
+  m_Father: {fileID: 1370168847}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1167446570
 GameObject:
@@ -849,6 +849,7 @@ GameObject:
   - component: {fileID: 2512387471000000003}
   - component: {fileID: 2512387471000000006}
   - component: {fileID: 2512387471000000005}
+  - component: {fileID: 2512387471000000007}
   m_Layer: 0
   m_Name: SkyRoot
   m_TagString: Untagged
@@ -870,95 +871,12 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1742066904}
-  - {fileID: 539305089}
   - {fileID: 1356595390}
   - {fileID: 1194023602}
-  - {fileID: 1493987619}
-  - {fileID: 1659378963}
+  - {fileID: 539305089}
+  - {fileID: 1031855388}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1493987618
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1493987619}
-  m_Layer: 0
-  m_Name: GalacticRoot
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1493987619
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1493987618}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1031855388}
-  m_Father: {fileID: 1370168847}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1659378962
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1659378963}
-  - component: {fileID: 1659378964}
-  m_Layer: 0
-  m_Name: SkyCalibrationController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1659378963
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1659378962}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -65.35099, y: 0, z: 227.6038}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1370168847}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1659378964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1659378962}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52f5711ecd5c35a4cac9441c07d42fc4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkyCalibrationController
-  celestialSphere: {fileID: 0}
-  arCamera: {fileID: 0}
-  defaultLatitude: 34.6937
-  defaultLongitude: 135.5023
-  useGps: 1
-  calibrateDelay: 1.5
 --- !u!1 &1742066900
 GameObject:
   m_ObjectHideFlags: 0
@@ -1474,12 +1392,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a0f6dcb37ca4d4b9f22b7fd715c94d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SiderealTimeRotation
-  referenceLongitude: 0
-  reverseDirection: 0
-  siderealTimeScale: 1
-  initialLocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  previousSiderealTime: 0
-  accumulatedSiderealDegrees: 0
 --- !u!114 &2512387471000000003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1492,23 +1404,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05f4a1166465c2045b07e8692826d951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CelestialSphereController
-  celestialSphere: {fileID: 1370168847}
-  alignmentEulerAngles: {x: 0, y: 0, z: 0}
-  siderealTimeScale: 1
-  reverseSiderealDirection: 0
-  useCompass: 1
-  reverseCompass: 0
-  logAstronomyState: 1
-  logIntervalSeconds: 5
-  alignmentRotation: {x: 0, y: 0, z: 0, w: 0}
-  simulatedSiderealTime: 0
-  initialized: 0
-  nextLogTime: 0
-  <CurrentLocalSiderealTimeDegrees>k__BackingField: 0
-  <Latitude>k__BackingField: 0
-  <Longitude>k__BackingField: 0
-  <Heading>k__BackingField: 0
-  previousSiderealTime: 0
 --- !u!114 &2512387471000000004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1541,7 +1436,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 512ebb532cb91e5408cd87984052a9da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CelestialSkyRotation
-  orientation: {fileID: 0}
+  orientation: {fileID: 2512387471000000006}
   useRealTime: 1
   timeScale: 1
 --- !u!114 &2512387471000000006
@@ -1556,7 +1451,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cdb03af92ba6f14f92394cde3c12a2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CelestialSkyOrientation
-  celestialSphere: {fileID: 0}
+  celestialSphere: {fileID: 1370168847}
+--- !u!114 &2512387471000000007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1370168846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52f5711ecd5c35a4cac9441c07d42fc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SkyCalibrationController
+  celestialSphere: {fileID: 1370168847}
+  arCamera: {fileID: 2512387468973847774}
+  defaultLatitude: 34.6937
+  defaultLongitude: 135.5023
+  useGps: 1
+  calibrateDelay: 1.5
 --- !u!1 &2512387471000000010
 GameObject:
   m_ObjectHideFlags: 0
