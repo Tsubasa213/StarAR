@@ -6,7 +6,7 @@ Shader "Unlit/ARCoreBackgroundWithBlackFilter"
         _FilterOpacity("Black Filter Opacity", Range(0, 1)) = 0.8
     }
 
-    // ARCore uses an external camera texture on OpenGLES 3.
+    // Android ARCore: OpenGL ES 3
     SubShader
     {
         Name "ARCore Background With Black Filter (GLES3)"
@@ -25,16 +25,11 @@ Shader "Unlit/ARCoreBackgroundWithBlackFilter"
             ZWrite On
             Lighting Off
             LOD 100
-            Tags
-            {
-                "LightMode" = "Always"
-            }
+            Tags { "LightMode" = "Always" }
 
             GLSLPROGRAM
-
             #pragma only_renderers gles3
             #pragma multi_compile_local __ ARCORE_IMAGE_STABILIZATION_ENABLED
-
             #include "UnityCG.glslinc"
 
 #ifdef SHADER_API_GLES3
@@ -57,7 +52,6 @@ Shader "Unlit/ARCoreBackgroundWithBlackFilter"
             {
 #ifdef SHADER_API_GLES3
                 gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-
 #ifdef ARCORE_IMAGE_STABILIZATION_ENABLED
                 textureCoord = gl_MultiTexCoord0.xyz;
 #else
@@ -81,9 +75,12 @@ Shader "Unlit/ARCoreBackgroundWithBlackFilter"
 #else
                 vec2 tc = textureCoord;
 #endif
-                vec3 result = texture(_MainTex, tc).xyz;
-                result *= 1.0 - clamp(_FilterOpacity, 0.0, 1.0);
+                vec3 cameraColor = texture(_MainTex, tc).xyz;
+                vec3 result = cameraColor *
+                    (1.0 - clamp(_FilterOpacity, 0.0, 1.0));
                 gl_FragColor = vec4(result, 1.0);
+
+                // Write far depth so virtual stars render in front of the camera image.
                 gl_FragDepth = 1.0;
 #endif
             }
@@ -92,7 +89,7 @@ Shader "Unlit/ARCoreBackgroundWithBlackFilter"
         }
     }
 
-    // Vulkan uses a regular sampler and HLSL syntax.
+    // Android ARCore: Vulkan
     SubShader
     {
         Name "ARCore Background With Black Filter (Vulkan)"
@@ -111,18 +108,13 @@ Shader "Unlit/ARCoreBackgroundWithBlackFilter"
             ZWrite On
             Lighting Off
             LOD 100
-            Tags
-            {
-                "LightMode" = "Always"
-            }
+            Tags { "LightMode" = "Always" }
 
             HLSLPROGRAM
-
             #pragma only_renderers vulkan
             #pragma multi_compile_local __ ARCORE_IMAGE_STABILIZATION_ENABLED
             #pragma vertex vert
             #pragma fragment frag
-
             #include "UnityCG.cginc"
 
 #ifndef ARCORE_IMAGE_STABILIZATION_ENABLED
@@ -149,8 +141,7 @@ Shader "Unlit/ARCoreBackgroundWithBlackFilter"
             VertexOutput vert(VertexInput input)
             {
                 VertexOutput output;
-                output.position = UnityObjectToClipPos(input.vertex.xyz);
-
+                output.position = UnityObjectToClipPos(input.vertex);
 #ifdef ARCORE_IMAGE_STABILIZATION_ENABLED
                 output.textureCoord = input.uv.xyz;
 #else
@@ -176,16 +167,17 @@ Shader "Unlit/ARCoreBackgroundWithBlackFilter"
 #else
                 float2 tc = input.textureCoord;
 #endif
-                float3 result = tex2D(_MainTex, tc).xyz;
-                result *= 1.0 - clamp(_FilterOpacity, 0.0, 1.0);
+                float3 cameraColor = tex2D(_MainTex, tc).xyz;
+                float3 result = cameraColor *
+                    (1.0 - clamp(_FilterOpacity, 0.0, 1.0));
 
                 FragmentOutput output;
                 output.color = float4(result, 1.0);
-                // Far depth keeps the AR stars in front of the camera image.
-                output.depth = 0.0;
+
+                // Match GLES3: far depth lets AR stars render over the background.
+                output.depth = 1.0;
                 return output;
             }
-
             ENDHLSL
         }
     }

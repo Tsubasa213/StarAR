@@ -115,8 +115,8 @@ public class StarGenerator : MonoBehaviour
 
         float scale =
             Mathf.Lerp(
-                0.1f,      // 5等星
-                0.7f,      // 明るい星
+                0.2f,      // 5等星
+                1.3f,      // 明るい星
                 Mathf.Clamp01((3f - mag) / 3f)
             );
 
